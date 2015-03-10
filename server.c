@@ -68,12 +68,13 @@ int main(int argc , char *argv[])
         puts("Connection accepted");
          
         pthread_t sniffer_thread;
+	pthread_t list_user;
         new_sock = malloc(1);
         *new_sock = client_sock;
 	curr = (user *)malloc(sizeof(user));	
 	curr->next=head;
 	curr->sock=client_sock;
-	strcpy(curr->userName,"user");	
+	strcpy(curr->userName,"anonymous");	
 	head=curr;
 	
          
@@ -82,6 +83,8 @@ int main(int argc , char *argv[])
             perror("could not create thread");
             return 1;
         }
+	
+         
          
         //Now join the thread , so that we dont terminate before the thread
         //pthread_join( sniffer_thread , NULL);
@@ -96,7 +99,7 @@ int main(int argc , char *argv[])
      
     return 0;
 }
- 
+
 /*
  * This will handle connection for each client
  * */
@@ -144,6 +147,22 @@ void *connection_handler(void *socket_desc)
 		strcpy(body_msg,strtok(NULL,":"));
 		printf("%s",user_tujuan);
 		flag_receive=1;
+	}
+	else if(client_message[0]==';'){
+		
+		curr=head;
+		
+		char list[2000];
+		strcpy(list,";");
+		while(curr)
+		{
+			strcat(list,curr->userName);
+			strcat(list,";");
+		
+			curr=curr->next;
+		}
+		write(sock , list , strlen(list));
+		
 	}
 	else 
 	{
