@@ -9,15 +9,21 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JLabel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author evaria
  */
-public class chat extends javax.swing.JFrame {
+public class ChatClient extends javax.swing.JFrame {
 
     /**
-     * Creates new form chat
+     * Creates new form ChatClient
      */
     
     private ObjectInputStream input;
@@ -27,7 +33,7 @@ public class chat extends javax.swing.JFrame {
     private int port;
     private List<String> clients;
     
-    public chat() {
+    public ChatClient() {
         clients = new ArrayList();
         initComponents();
     }
@@ -50,7 +56,7 @@ public class chat extends javax.swing.JFrame {
             return false;
         }
         
-        new ChatClient.ListenFromServer().start();
+        new ChatClient.Listen().start();
         try {
             output.writeObject("login~" + name + "~" + name + "sedang login...~server~\n");
             output.writeObject("list~" + name + "~" + name + "sedang login...~server~\n");
@@ -129,8 +135,14 @@ public class chat extends javax.swing.JFrame {
         jLabel7.setText("Nama");
 
         b_masuk.setText("Masuk");
+        b_masuk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_masukActionPerformed(evt);
+            }
+        });
 
         b_keluar.setText("Keluar");
+        b_keluar.setEnabled(false);
 
         t_server.setText("255.255.255.255");
 
@@ -142,7 +154,15 @@ public class chat extends javax.swing.JFrame {
             }
         });
 
+        t_pesan.setEditable(false);
+
         b_kirim.setText("Kirim");
+        b_kirim.setEnabled(false);
+        b_kirim.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_kirimActionPerformed(evt);
+            }
+        });
 
         ta_inbox.setColumns(20);
         ta_inbox.setRows(5);
@@ -223,8 +243,36 @@ public class chat extends javax.swing.JFrame {
 
     private void t_namaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_t_namaActionPerformed
         // TODO add your handling code here:
-        this.server = 
+        
     }//GEN-LAST:event_t_namaActionPerformed
+
+    private void b_masukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_masukActionPerformed
+        // TODO add your handling code here:
+        this.server = t_server.getText();
+        this.port = new Integer (t_port.getText());
+        this.name = t_nama.getText();
+        if (start())
+        {
+            t_server.setEditable(false);
+            t_port.setEditable(false);
+            t_nama.setEditable(false);
+            t_pesan.setEditable(true);
+            b_kirim.setEnabled(true);
+            b_masuk.setEnabled(false);
+            b_keluar.setEnabled(true);
+        }
+    }//GEN-LAST:event_b_masukActionPerformed
+
+    private void b_kirimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_kirimActionPerformed
+        // TODO add your handling code here:
+        try {
+            String message = "postText~" + name + "~" + t_pesan.getText() + "~all~\n";
+            output.writeObject(message);
+            t_pesan.setText("");
+        } catch (IOException ex) {
+            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null,ex);
+        }
+    }//GEN-LAST:event_b_kirimActionPerformed
 
     /**
      * @param args the command line arguments
@@ -243,20 +291,21 @@ public class chat extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(chat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ChatClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(chat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ChatClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(chat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ChatClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(chat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ChatClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new chat().setVisible(true);
+                new ChatClient().setVisible(true);
             }
         });
     }
@@ -278,3 +327,4 @@ public class chat extends javax.swing.JFrame {
     private javax.swing.JTextArea ta_inbox;
     // End of variables declaration//GEN-END:variables
 }
+

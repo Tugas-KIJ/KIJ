@@ -127,10 +127,14 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Masuk"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="b_masukActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="b_keluar">
       <Properties>
         <Property name="text" type="java.lang.String" value="Keluar"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="t_server">
@@ -149,11 +153,18 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="t_pesan">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="b_kirim">
       <Properties>
         <Property name="text" type="java.lang.String" value="Kirim"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="b_kirimActionPerformed"/>
+      </Events>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
       <AuxValues>
