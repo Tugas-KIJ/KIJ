@@ -7,17 +7,19 @@ package chatui;
 
 import java.io.IOException;
 import javax.swing.table.DefaultTableModel;
-
+import chatui.ChatClient;
+import javax.swing.JTextArea;
 /**
  *
  * @author SONY VAIO
  */
 public class Listen extends Thread {
-    @Override
+ 
+    private JTextArea ta_inbox;
 public void run() {
     while (true) {
         try {
-            String msg = (String) input.rea
+            String msg = null;
             String res;
             String type = msg.split("~")[0];
             String pengirim = msg.split("~")[1];
