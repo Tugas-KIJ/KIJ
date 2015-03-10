@@ -53,7 +53,9 @@ public class ChatClient extends javax.swing.JFrame {
             ostream = socket.getOutputStream();
             pwrite = new PrintWriter(ostream, true);   // receiving from server ( receiveRead object) 
             istream = socket.getInputStream(); 
-            receiveRead = new BufferedReader(new InputStreamReader(istream)); 
+            receiveRead = new BufferedReader(new InputStreamReader(istream));
+            
+            
          
         } catch (IOException eIO) {
             System.out.println("Exception creating new Input/outputStreams: " + eIO);
@@ -143,9 +145,9 @@ public class ChatClient extends javax.swing.JFrame {
             }
         });
 
-        t_server.setText("255.255.255.255");
+        t_server.setText("10.151.36.24");
 
-        t_port.setText("8080");
+        t_port.setText("5555");
 
         t_nama.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -167,11 +169,6 @@ public class ChatClient extends javax.swing.JFrame {
         ta_inbox.setRows(5);
         jScrollPane1.setViewportView(ta_inbox);
 
-        l_kontak.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane2.setViewportView(l_kontak);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -180,7 +177,7 @@ public class ChatClient extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -195,19 +192,19 @@ public class ChatClient extends javax.swing.JFrame {
                         .addComponent(t_nama, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(t_pesan, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(t_pesan)
                         .addGap(18, 18, 18)
                         .addComponent(b_kirim)
                         .addGap(16, 16, 16)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                         .addComponent(b_masuk)
                         .addGap(18, 18, 18)
                         .addComponent(b_keluar))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(3, 3, 3)
-                        .addComponent(jScrollPane2)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addGap(14, 14, 14))
         );
         layout.setVerticalGroup(
@@ -260,6 +257,9 @@ public class ChatClient extends javax.swing.JFrame {
             b_masuk.setEnabled(false);
             b_keluar.setEnabled(true);
         }
+        
+        pwrite.println(name); // sending to server 
+        pwrite.flush(); // flush the data 
     }//GEN-LAST:event_b_masukActionPerformed
 
     private void b_kirimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_kirimActionPerformed

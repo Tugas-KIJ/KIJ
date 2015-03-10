@@ -17,7 +17,7 @@ public class Listen extends Thread {
 public void run() {
     while (true) {
         try {
-            String msg = (String) input.readObject();
+            String msg = (String) input.rea
             String res;
             String type = msg.split("~")[0];
             String pengirim = msg.split("~")[1];
