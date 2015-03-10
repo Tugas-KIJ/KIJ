@@ -106,32 +106,79 @@ void *connection_handler(void *socket_desc)
     int sock = *(int*)socket_desc;
     int read_size;
     int i=0; 
-    char *message , client_message[2000];
+    char *message , client_message[2000],msg[2000],body_msg[2000],user[100],user_tujuan[100];
     //Send some messages to the client
-    
+    curr=head;
+	
+    read_size = read(sock,client_message,2000);
+    while(curr){
+	    if(curr->sock==sock)
+		{
+			client_message[read_size]='\0';
+			strtok(client_message,"\r\n");		
+			strcpy(curr->userName,client_message);
+			strcpy(user,client_message);
+		}
+	    curr=curr->next;
+    }
     message = "Greetings! I am your connection handler\n";
     write(sock , message , strlen(message));
      
     message = "Now type something and i shall repeat what you type \n";
     write(sock , message , strlen(message));
-     
+    
+    int flag_receive=0;
+    int curr_user=0;
     //Receive a message from client
-    while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 )
+    while(read_size = read(sock , client_message , 2000))
     {
         //Send the message back to client
-	curr=head;
-	while(curr)
-	{
-		write(curr->sock , client_message , strlen(client_message));
-		curr=curr->next;
+	printf("%s",client_message);
+	
+	client_message[read_size]='\0';
+	strtok(client_message,"\r\n");
+	
+	if(client_message[0]==':'){
+		//strtok(,":");	
+		strcpy(user_tujuan,strtok(client_message,":"));
+		strcpy(body_msg,strtok(NULL,":"));
+		printf("%s",user_tujuan);
+		flag_receive=1;
 	}
+	else 
+	{
+		flag_receive=0;
+		strcpy(body_msg,client_message);
+	}
+	printf("%s",client_message);
+
+	if(flag_receive==1){
+		
+		curr=head;	
+		while(curr)
+		{
+			if(strcmp(user_tujuan,curr->userName)==0){
+				curr_user=curr->sock;				
+				sprintf(msg,"%s: %s\r\n",user,body_msg);
+				write(curr_user , msg , strlen(msg));
+			
+			}
+			curr=curr->next;
+		}
+	}
+	else
+	{
+		sprintf(msg,"%s: %s\r\n",user,body_msg);
+		write(curr_user , msg , strlen(msg));
+	}
+
 
         //write(sock , client_message , strlen(client_message));
     }
      
     if(read_size == 0)
     {
-        puts("Client disconnected");
+        printf("%s: Client disconnected\n",user);
 	curr=head;
 	while(curr){
 		if(curr->sock==sock)
