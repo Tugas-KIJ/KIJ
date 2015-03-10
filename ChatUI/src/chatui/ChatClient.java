@@ -5,10 +5,8 @@
  */
 package chatui;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,8 +24,10 @@ public class ChatClient extends javax.swing.JFrame {
      * Creates new form ChatClient
      */
     
-    private ObjectInputStream input;
-    private ObjectOutputStream output;
+    private BufferedReader keyRead, receiveRead;
+    private OutputStream ostream;
+    private PrintWriter pwrite;
+    private InputStream istream; 
     private Socket socket;
     private String server, name;
     private int port;
@@ -49,46 +49,38 @@ public class ChatClient extends javax.swing.JFrame {
         System.out.println(msg);
 
         try {
-            input = new ObjectInputStream(socket.getInputStream());
-            output = new ObjectOutputStream(socket.getOutputStream());
+            keyRead = new BufferedReader(new InputStreamReader(System.in)); // sending to client (pwrite object) 
+            ostream = socket.getOutputStream();
+            pwrite = new PrintWriter(ostream, true);   // receiving from server ( receiveRead object) 
+            istream = socket.getInputStream(); 
+            receiveRead = new BufferedReader(new InputStreamReader(istream)); 
+         
         } catch (IOException eIO) {
             System.out.println("Exception creating new Input/outputStreams: " + eIO);
             return false;
         }
         
-        new ChatClient.Listen().start();
-        try {
-            output.writeObject("login~" + name + "~" + name + "sedang login...~server~\n");
-            output.writeObject("list~" + name + "~" + name + "sedang login...~server~\n");
-        } catch (IOException eIO) {
-            System.out.println("Exception doing login : " + eIO);
-            disconnect();
-            return false;
-        }
+        //new ChatClient.Listen().start();
+        
         return true;
     }
     
-    private void disconnect() {
+    public boolean disconnect() {
         try {
-            // TODO add your handling code here:
-            output.writeObject("logout~" + name + "~" + name + " sudah logout...~Server~\n");
-        } catch (IOException ex) {
-            //Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null,ex);
-        }
-        try {
-            if (input != null) {
-                input.close();
+            if (istream != null) {
+                istream.close();
             }
         } 
         catch (Exception e) {
-        
+        return false;
         } 
         try { 
-            if (output != null) {
-                output.close();
+            if (ostream != null) {
+                ostream.close();
             }
         } 
         catch (Exception e) {
+            return false;
         } 
         try { 
             if (socket != null) {
@@ -96,7 +88,9 @@ public class ChatClient extends javax.swing.JFrame {
             }
         } 
         catch (Exception e) {
+            return false;
         }
+        return true;
     }
 
     /**
@@ -143,6 +137,11 @@ public class ChatClient extends javax.swing.JFrame {
 
         b_keluar.setText("Keluar");
         b_keluar.setEnabled(false);
+        b_keluar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_keluarActionPerformed(evt);
+            }
+        });
 
         t_server.setText("255.255.255.255");
 
@@ -264,15 +263,25 @@ public class ChatClient extends javax.swing.JFrame {
     }//GEN-LAST:event_b_masukActionPerformed
 
     private void b_kirimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_kirimActionPerformed
-        // TODO add your handling code here:
-        try {
-            String message = "postText~" + name + "~" + t_pesan.getText() + "~all~\n";
-            output.writeObject(message);
-            t_pesan.setText("");
-        } catch (IOException ex) {
-            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null,ex);
-        }
+        String message = "postText~" + name + "~" + t_pesan.getText() + "~all~\n";
+        pwrite.println(message);
+        pwrite.flush();
+        t_pesan.setText("");
     }//GEN-LAST:event_b_kirimActionPerformed
+
+    private void b_keluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_keluarActionPerformed
+        // TODO add your handling code here:
+        if (disconnect())
+        {
+            t_server.setEditable(true);
+            t_port.setEditable(true);
+            t_nama.setEditable(true);
+            t_pesan.setEditable(false);
+            b_kirim.setEnabled(false);
+            b_masuk.setEnabled(true);
+            b_keluar.setEnabled(false);
+        }
+    }//GEN-LAST:event_b_keluarActionPerformed
 
     /**
      * @param args the command line arguments
