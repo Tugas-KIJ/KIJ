@@ -22,10 +22,7 @@ public class Sender_Thread extends Thread
             msgOut = aOut;
     }
 
-        /**
-         * Until interrupted reads messages from the standard input (keyboard)
-         * and sends them to the chat server through the socket.
-         */
+        
     @Override
     public void run()
     {
@@ -37,7 +34,7 @@ public class Sender_Thread extends Thread
     msgOut.flush();
     }
     } catch (IOException ioe) {
-                // Communication is broken
+                
     }
     }     
 }
