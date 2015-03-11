@@ -49,6 +49,11 @@ public class ChatClient extends javax.swing.JFrame {
         System.out.println(msg);
 
         try {
+            Listen l = new Listen(ta_inbox, socket);
+            l.start();
+            
+            
+            
             keyRead = new BufferedReader(new InputStreamReader(System.in)); // sending to client (pwrite object) 
             ostream = socket.getOutputStream();
             pwrite = new PrintWriter(ostream, true);   // receiving from server ( receiveRead object) 
@@ -145,10 +150,11 @@ public class ChatClient extends javax.swing.JFrame {
             }
         });
 
-        t_server.setText("10.151.36.24");
+        t_server.setText("10.151.36.21");
 
-        t_port.setText("5555");
+        t_port.setText("9000");
 
+        t_nama.setText("WAHYU");
         t_nama.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 t_namaActionPerformed(evt);
@@ -258,14 +264,27 @@ public class ChatClient extends javax.swing.JFrame {
             b_keluar.setEnabled(true);
         }
         
-        pwrite.println(name); // sending to server 
+        
+        pwrite.println(name); // sending to server
+        System.out.println(name);
         pwrite.flush(); // flush the data 
+       
+        Userr li = new Userr(socket);
+        li.start();
     }//GEN-LAST:event_b_masukActionPerformed
 
     private void b_kirimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_kirimActionPerformed
-        String message = "postText~" + name + "~" + t_pesan.getText() + "~all~\n";
-        pwrite.println(message);
+        String message = ":" + "hafiz" + ":" + t_pesan.getText();
+        //System.out.println(message);
+        //pwrite.println(message);
+        message="$";
+        pwrite.println(t_pesan.getText());
         pwrite.flush();
+        try {
+            ostream.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
         t_pesan.setText("");
     }//GEN-LAST:event_b_kirimActionPerformed
 
