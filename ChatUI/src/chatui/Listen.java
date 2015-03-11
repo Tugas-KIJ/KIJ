@@ -8,7 +8,17 @@ package chatui;
 import java.io.IOException;
 import javax.swing.table.DefaultTableModel;
 import chatui.ChatClient;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTextArea;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 /**
  *
  * @author SONY VAIO
@@ -16,57 +26,50 @@ import javax.swing.JTextArea;
 public class Listen extends Thread {
  
     private JTextArea ta_inbox;
+    private JList li_user;
+    Socket cli;
+    public Listen(JTextArea ta, Socket cli, JList li_user){
+        this.ta_inbox=ta;
+        this.cli=cli;
+        this.li_user=li_user;
+    }
 public void run() {
-    while (true) {
+        InputStream istream = null; 
         try {
-            String msg = null;
-            String res;
-            String type = msg.split("~")[0];
-            String pengirim = msg.split("~")[1];
-            String text = msg.split("~")[2];
-            String kepada = msg.split("~")[3];
-            switch (type) {
-                case "recieveText":
-                    res = pengirim + ": " + text;
-                    ta_inbox.setText(ta_inbox.getText() + res + "\n");
-                    break;
-                case "recievePrivateText":
-                    res = pengirim + ": " + text;
-                    if (kepada.equals(name)) {
-                        ta_inbox.setText(ta_inbox.getText() + res + "\n");
-                    }
-                    break;
-                case "login":
-                    ta_inbox.setText(ta_inbox.getText() + pengirim + " sedah login..." + "\n");
-                    clients.add(pengirim);
-                    break;
-                case "logout":
-                    ta_inbox.setText(ta_inbox.getText() + pengirim + " telah logout..." + "\n");
-                    clients.remove(pengirim);
-                    break;
-                case "list":
-                    setTable(text);
-                    break;
+            istream = cli.getInputStream();
+            BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+            String receiveMessage;
+            while((receiveMessage = receiveRead.readLine()) != null)
+            {
+               if(receiveMessage.startsWith(";")==false)
+               {
+                    ta_inbox.append(receiveMessage);
+                     ta_inbox.append("\n");
+               }
+               else
+               {
+                   
+                  // String type = msg.split("~")[0];
+                   String type = receiveMessage.split(";")[0];
+                    DefaultListModel tes = new DefaultListModel();
+                    tes.addElement(receiveMessage.split(";")[1]);
+                    tes.addElement(receiveMessage.split(";")[2]);
+                    tes.addElement(receiveMessage.split(";")[3]);
+                    
+                    li_user.setModel(tes);   //memasukkan items tes ke JList lstTes.
+
+        
+               }
+                    
             }
-        } 
-        catch (IOException e) {
-            System.out.println("Server has close the connection: " + e);
-            break;
-        } 
-        catch (ClassNotFoundException e2) {
+        } catch (IOException ex) {
+            Logger.getLogger(Listen.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                istream.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Listen.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
-}
-
-private void setTable(String text) {
-    int rows = text.split(":").length - 1;
-    Object[][] data = new Object[rows][1];
-    for (int i = 0; i < rows; i++) {
-        String t = text.split("split(":")[i];
-        data[i][0] = t;
-    }
-    String[] header = {"Clients"};
-    clientTable.setModel(new DefaultTableModel(data, header));
-}
-    
 }
