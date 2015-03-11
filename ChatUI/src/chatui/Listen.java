@@ -17,6 +17,8 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTextArea;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 /**
  *
  * @author SONY VAIO
@@ -24,10 +26,12 @@ import javax.swing.JTextArea;
 public class Listen extends Thread {
  
     private JTextArea ta_inbox;
+    private JList li_user;
     Socket cli;
-    public Listen(JTextArea ta, Socket cli){
+    public Listen(JTextArea ta, Socket cli, JList li_user){
         this.ta_inbox=ta;
         this.cli=cli;
+        this.li_user=li_user;
     }
 public void run() {
         InputStream istream = null; 
@@ -37,11 +41,26 @@ public void run() {
             String receiveMessage;
             while((receiveMessage = receiveRead.readLine()) != null)
             {
-              
+               if(receiveMessage.startsWith(";")==false)
+               {
                     ta_inbox.append(receiveMessage);
-                    System.out.println(receiveMessage);
-                    ta_inbox.append("\n");
-            
+                     ta_inbox.append("\n");
+               }
+               else
+               {
+                   
+                  // String type = msg.split("~")[0];
+                   String type = receiveMessage.split(";")[0];
+                    DefaultListModel tes = new DefaultListModel();
+                    tes.addElement(receiveMessage.split(";")[1]);
+                    tes.addElement(receiveMessage.split(";")[2]);
+                    tes.addElement(receiveMessage.split(";")[3]);
+                    
+                    li_user.setModel(tes);   //memasukkan items tes ke JList lstTes.
+
+        
+               }
+                    
             }
         } catch (IOException ex) {
             Logger.getLogger(Listen.class.getName()).log(Level.SEVERE, null, ex);
