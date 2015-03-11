@@ -48,16 +48,14 @@ public void run() {
                }
                else
                {
-                   
-                  // String type = msg.split("~")[0];
-                   String type = receiveMessage.split(";")[0];
-                    DefaultListModel tes = new DefaultListModel();
-                    tes.addElement(receiveMessage.split(";")[1]);
-                    tes.addElement(receiveMessage.split(";")[2]);
-                    tes.addElement(receiveMessage.split(";")[3]);
-                    
+                   DefaultListModel tes = new DefaultListModel();
+                   String[] pecah1 = receiveMessage.split(";");
+                    for(int counter = 1; counter < pecah1.length; counter++){
+                       tes.addElement(pecah1[counter]);
+                    }
+                 
                     li_user.setModel(tes);   //memasukkan items tes ke JList lstTes.
-
+                    
         
                }
                     
