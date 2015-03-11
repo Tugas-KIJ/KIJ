@@ -114,6 +114,7 @@ void *connection_handler(void *socket_desc)
     curr=head;
 	
     read_size = read(sock,client_message,2000);
+    curr=head;
     while(curr){
 	    if(curr->sock==sock)
 		{
@@ -135,8 +136,8 @@ void *connection_handler(void *socket_desc)
     //Receive a message from client
     while(read_size = read(sock , client_message , 2000))
     {
-        //Send the message back to client
-	printf("%s",client_message);
+        
+	//printf("%s",client_message);
 	
 	client_message[read_size]='\0';
 	strtok(client_message,"\r\n");
@@ -148,7 +149,7 @@ void *connection_handler(void *socket_desc)
 		printf("%s",user_tujuan);
 		flag_receive=1;
 	}
-	else if(client_message[0]==';'){
+	else if(client_message[0]=='$'){
 		
 		curr=head;
 		
@@ -161,15 +162,18 @@ void *connection_handler(void *socket_desc)
 		
 			curr=curr->next;
 		}
-		write(sock , list , strlen(list));
+		flag_receive=0;
+		
+		send(sock , list , strlen(list),0);
+		send(sock , "\r\n" , strlen("\r\n"),0);
+		
 		
 	}
 	else 
 	{
-		flag_receive=0;
+		flag_receive=2;
 		strcpy(body_msg,client_message);
 	}
-	printf("%s",client_message);
 
 	if(flag_receive==1){
 		
@@ -179,19 +183,21 @@ void *connection_handler(void *socket_desc)
 			if(strcmp(user_tujuan,curr->userName)==0){
 				curr_user=curr->sock;				
 				sprintf(msg,"%s: %s\r\n",user,body_msg);
-				write(curr_user , msg , strlen(msg));
+				send(curr_user , msg , strlen(msg),0);
+				send(curr_user , "\r\n" , strlen("\r\n"),0);
 			
 			}
 			curr=curr->next;
 		}
 	}
-	else
+	else if(flag_receive==2)
 	{
 		sprintf(msg,"%s: %s\r\n",user,body_msg);
 		write(curr_user , msg , strlen(msg));
 	}
 
-
+	strcpy(client_message,"");
+	
         //write(sock , client_message , strlen(client_message));
     }
      
