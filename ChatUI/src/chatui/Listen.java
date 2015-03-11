@@ -19,6 +19,9 @@ import java.util.logging.Logger;
 import javax.swing.JTextArea;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 /**
  *
  * @author SONY VAIO
@@ -28,10 +31,12 @@ public class Listen extends Thread {
     private JTextArea ta_inbox;
     private JList li_user;
     Socket cli;
-    public Listen(JTextArea ta, Socket cli, JList li_user){
+    private JTextField too;
+    public Listen(JTextArea ta, Socket cli, JList li_user, JTextField to){
         this.ta_inbox=ta;
         this.cli=cli;
         this.li_user=li_user;
+        this.too=to;
     }
 public void run() {
         InputStream istream = null; 
@@ -56,7 +61,22 @@ public void run() {
                  
                     li_user.setModel(tes);   //memasukkan items tes ke JList lstTes.
                     
-        
+                    li_user.addListSelectionListener(new ListSelectionListener() 
+                        { 
+                            @Override 
+                            public void valueChanged(ListSelectionEvent arg0) 
+                            { 
+                                if (!arg0.getValueIsAdjusting()) 
+                                { 
+                                    if(li_user.getSelectedValue()!=null){
+                                        String selected=new String(li_user.getSelectedValue().toString());
+                                        too.setText(selected);
+                                    }
+                                } 
+                            } 
+                        }
+                    );
+                    
                }
                     
             }
