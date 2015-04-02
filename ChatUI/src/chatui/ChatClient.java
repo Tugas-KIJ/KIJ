@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -35,7 +38,20 @@ public class ChatClient extends javax.swing.JFrame {
     
     public ChatClient() {
         clients = new ArrayList();
+        
         initComponents();
+        
+        
+        
+  /*      l_kontak.addListSelectionListener(new );
+        l_kontak.addListSelectionListener(new ListSelectionListener() {
+    public void valueChanged(ListSelectionEvent event) {
+        if (!event.getValueIsAdjusting()){
+            JList source = (JList)event.getSource();
+            String selected = source.getSelectedValue().toString();
+        }
+    }
+});*/
     }
     
     public boolean start() {
@@ -49,7 +65,7 @@ public class ChatClient extends javax.swing.JFrame {
         System.out.println(msg);
 
         try {
-            Listen l = new Listen(ta_inbox, socket);
+            Listen l = new Listen(ta_inbox, socket, l_kontak, t_to);
             l.start();
             
             
@@ -123,6 +139,8 @@ public class ChatClient extends javax.swing.JFrame {
         ta_inbox = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         l_kontak = new javax.swing.JList();
+        jLabel1 = new javax.swing.JLabel();
+        t_to = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -177,40 +195,48 @@ public class ChatClient extends javax.swing.JFrame {
 
         jScrollPane2.setViewportView(l_kontak);
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel1.setText("TO");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(t_server, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(t_port, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel7)
-                        .addGap(18, 18, 18)
-                        .addComponent(t_nama, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(t_pesan)
-                        .addGap(18, 18, 18)
-                        .addComponent(b_kirim)
-                        .addGap(16, 16, 16)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(t_server, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(t_port, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel7)
+                                .addGap(18, 18, 18)
+                                .addComponent(t_nama, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(3, 3, 3)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                                .addComponent(b_masuk)
+                                .addGap(18, 18, 18)
+                                .addComponent(b_keluar))))
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
-                        .addComponent(b_masuk)
+                        .addComponent(jLabel1)
                         .addGap(18, 18, 18)
-                        .addComponent(b_keluar))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                        .addComponent(t_to)
+                        .addGap(18, 18, 18)
+                        .addComponent(t_pesan, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(b_kirim)))
                 .addGap(14, 14, 14))
         );
         layout.setVerticalGroup(
@@ -228,15 +254,16 @@ public class ChatClient extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(b_keluar)
                         .addComponent(b_masuk)))
-                .addGap(0, 28, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(t_pesan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(b_kirim)))
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(t_pesan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(b_kirim)
+                    .addComponent(jLabel1)
+                    .addComponent(t_to, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -247,7 +274,9 @@ public class ChatClient extends javax.swing.JFrame {
         // TODO add your handling code here:
         
     }//GEN-LAST:event_t_namaActionPerformed
-
+    
+    
+    
     private void b_masukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_masukActionPerformed
         // TODO add your handling code here:
         this.server = t_server.getText();
@@ -273,12 +302,14 @@ public class ChatClient extends javax.swing.JFrame {
         li.start();
     }//GEN-LAST:event_b_masukActionPerformed
 
+
+    
     private void b_kirimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_kirimActionPerformed
-        String message = ":" + "hafiz" + ":" + t_pesan.getText();
+        String message = ":" + t_to.getText() + ":" + t_pesan.getText();
         //System.out.println(message);
-        //pwrite.println(message);
-        message="$";
-        pwrite.println(t_pesan.getText());
+        pwrite.println(message);
+        //message="$";
+        //pwrite.println(t_pesan.getText());
         pwrite.flush();
         try {
             ostream.flush();
@@ -342,6 +373,7 @@ public class ChatClient extends javax.swing.JFrame {
     private javax.swing.JButton b_keluar;
     private javax.swing.JButton b_kirim;
     private javax.swing.JButton b_masuk;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -352,6 +384,7 @@ public class ChatClient extends javax.swing.JFrame {
     private javax.swing.JTextField t_pesan;
     private javax.swing.JTextField t_port;
     private javax.swing.JTextField t_server;
+    private javax.swing.JTextField t_to;
     private javax.swing.JTextArea ta_inbox;
     // End of variables declaration//GEN-END:variables
 }

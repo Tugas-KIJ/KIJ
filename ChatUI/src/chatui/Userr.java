@@ -42,7 +42,7 @@ public class Userr extends Thread  {
                 pwrite.println("$"); // sending to server
                 pwrite.flush(); // flush the data
                 try {
-                    sleep(1000);
+                    sleep(5000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Userr.class.getName()).log(Level.SEVERE, null, ex);
                 }

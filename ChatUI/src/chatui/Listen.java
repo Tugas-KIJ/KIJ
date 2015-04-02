@@ -38,10 +38,6 @@ public class Listen extends Thread {
         this.li_user=li_user;
         this.too=to;
     }
-
-    Listen(JTextArea ta_inbox, Socket socket) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 public void run() {
         InputStream istream = null; 
         try {
@@ -81,6 +77,7 @@ public void run() {
                         }
                     );
                     
+                   
                }
                     
             }
