@@ -64,6 +64,7 @@ public class ChatClient extends javax.swing.JFrame {
         String msg = "Connection accepted " + socket.getInetAddress() + ":" + socket.getPort();
         System.out.println(msg);
 
+        
         try {
             Listen l = new Listen(ta_inbox, socket, l_kontak, t_to);
             l.start();
@@ -114,6 +115,20 @@ public class ChatClient extends javax.swing.JFrame {
             return false;
         }
         return true;
+    }
+    
+     public String CheckLenPlain(String plain){
+        if(plain.length()%8!=0) {
+            int len=8-plain.length()%8;
+             
+            for(int i=0; i<len; i++)
+                plain=plain.concat("#");
+             
+        } else {
+            return plain;
+        }
+        return plain;
+         
     }
 
     /**
@@ -305,7 +320,13 @@ public class ChatClient extends javax.swing.JFrame {
 
     
     private void b_kirimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_kirimActionPerformed
-        String message = ":" + t_to.getText() + ":" + t_pesan.getText();
+        
+        
+        String ui = CheckLenPlain(t_pesan.getText());
+        
+        String message = ":" + t_to.getText() + ":" + ui;
+        
+        
         //System.out.println(message);
         pwrite.println(message);
         //message="$";
