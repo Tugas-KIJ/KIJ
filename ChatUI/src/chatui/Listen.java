@@ -48,7 +48,8 @@ public void run() {
             {
                if(receiveMessage.startsWith(";")==false)
                {
-                    ta_inbox.append(receiveMessage);
+                   String[] pesan = receiveMessage.split(";");
+                    ta_inbox.append(pesan[0]);
                      ta_inbox.append("\n");
                }
                else
