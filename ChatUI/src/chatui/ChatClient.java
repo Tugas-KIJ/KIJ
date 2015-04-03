@@ -16,9 +16,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
 
 /**
  *
+ * 
  * @author evaria
  */
 public class ChatClient extends javax.swing.JFrame {
@@ -118,17 +120,20 @@ public class ChatClient extends javax.swing.JFrame {
     }
     
      public String CheckLenPlain(String plain){
-        if(plain.length()%8!=0) {
+        int i = 0;
+         if(plain.length()%8!=0) {
             int len=8-plain.length()%8;
-             
-            for(int i=0; i<len; i++)
-                plain=plain.concat("#");
-             
+            for(; i<len; i++)
+                plain=plain.concat(";");
         } else {
             return plain;
         }
         return plain;
-         
+    }
+     
+    public static void warningBox(String warningMessage, String titleBar)
+    {
+        JOptionPane.showMessageDialog(null, warningMessage, titleBar, JOptionPane.WARNING_MESSAGE);
     }
 
     /**
@@ -183,7 +188,7 @@ public class ChatClient extends javax.swing.JFrame {
             }
         });
 
-        t_server.setText("10.151.36.21");
+        t_server.setText("10.151.36.26");
 
         t_port.setText("9000");
 
@@ -204,6 +209,7 @@ public class ChatClient extends javax.swing.JFrame {
             }
         });
 
+        ta_inbox.setEditable(false);
         ta_inbox.setColumns(20);
         ta_inbox.setRows(5);
         jScrollPane1.setViewportView(ta_inbox);
@@ -212,6 +218,8 @@ public class ChatClient extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel1.setText("TO");
+
+        t_to.setEditable(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -321,8 +329,20 @@ public class ChatClient extends javax.swing.JFrame {
     
     private void b_kirimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_kirimActionPerformed
         
+        if(t_pesan.getText().isEmpty() || t_to.getText().isEmpty())
+        {
+            warningBox("Tujuan atau Isi Pesan Tidak Boleh Kosong!", "WARNING");
+            return;
+        }
+        if(t_pesan.getText().endsWith(";"))
+        {
+            warningBox("Isi Pesan Tidak Boleh Mengandung Karakter ';' !", "WARNING");
+            return;
+        }
         
         String ui = CheckLenPlain(t_pesan.getText());
+        
+        
         
         String message = ":" + t_to.getText() + ":" + ui;
         
@@ -332,6 +352,7 @@ public class ChatClient extends javax.swing.JFrame {
         //message="$";
         //pwrite.println(t_pesan.getText());
         pwrite.flush();
+        
         try {
             ostream.flush();
         } catch (IOException ex) {
