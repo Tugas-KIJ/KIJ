@@ -20,8 +20,11 @@ import javax.swing.JTextArea;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JTextField;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableModel;
 /**
  *
  * @author SONY VAIO
@@ -32,11 +35,13 @@ public class Listen extends Thread {
     private JList li_user;
     Socket cli;
     private JTextField too;
-    public Listen(JTextArea ta, Socket cli, JList li_user, JTextField to){
+    private JTable tabel;
+    public Listen(JTextArea ta, Socket cli, JList li_user, JTextField to, JTable tabel){
         this.ta_inbox=ta;
         this.cli=cli;
         this.li_user=li_user;
         this.too=to;
+        this.tabel=tabel;
     }
 public void run() {
         InputStream istream = null; 
@@ -61,6 +66,8 @@ public void run() {
                     }
                  
                     li_user.setModel(tes);   //memasukkan items tes ke JList lstTes.
+                    
+                    tabel.setModel((TableModel) tes);
                     
                     li_user.addListSelectionListener(new ListSelectionListener() 
                         { 
