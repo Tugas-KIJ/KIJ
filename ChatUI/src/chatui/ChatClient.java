@@ -56,6 +56,61 @@ public class ChatClient extends javax.swing.JFrame {
 });*/
     }
     
+    public static String keystringbinary(String a){
+    byte[] infoBin;
+    String g = "";
+        infoBin = a.getBytes();
+        for (byte b : infoBin) {
+            g += "0" + Integer.toBinaryString(b);
+        }
+        //System.out.println(g);
+        return g;
+    }
+    
+    public static String XOR(String a, String b, int panjang){
+        String g="";
+       // System.out.println(a.length());
+        for(int i = 0; i<panjang;i++){
+            if(a.charAt(i)== b.charAt(i)){
+                g += "0";
+            }
+            else{
+                g += "1";
+            }
+        }
+        return g;
+    }
+    
+    private String count1(String pesan)
+    {
+        String counter = "akuwahyu";
+        String key = "akuhafiz";
+        
+        
+        DES des = new DES();
+        String hasil_enkrip = des.Enkripsi(counter, key);
+        System.out.println(hasil_enkrip);
+        //panggil difhel
+        //panggil encrypt 
+        String encript;
+        String convxor;
+        String cipher;
+        int panjang = pesan.length();
+        int banyak_counter = panjang /8;
+        for (int x = 0; x < banyak_counter; x = x+1)
+        {
+            
+             counter = counter + x;
+             Integer.toBinaryString(counter);
+             //key di enkrip
+             
+             // plain text 
+             String temp = pesan.substring((x*8),((x+1)*8)-1);
+             convxor = XOR(temp,encript);
+        }
+    }
+    
+    
     public boolean start() {
         try {
             socket = new Socket(server, port);
