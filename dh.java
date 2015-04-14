@@ -19,6 +19,7 @@ public class DH {
      */
     static int p= 353;
     static int g= 3;
+    static int min=100;
     public static int pubKey(int key,int g,int p)
     {
         BigInteger pub= BigInteger.valueOf(g).pow(key).mod(BigInteger.valueOf(p));
@@ -29,14 +30,21 @@ public class DH {
         BigInteger key= BigInteger.valueOf(pubKey).pow(secKey).mod(BigInteger.valueOf(p));
         return key.intValue();
     }
+    public static int random()
+    {
+        return (int) (min + (Math.random() * (p - min)));
+    }
     public static void main(String[] args) {
-        int alicePrivate =98;
-        int bobPrivate=99;
+        int alicePrivate =random();
+        int bobPrivate=random();
         int alicePublic=pubKey(alicePrivate,g,p);
         int bobPublic=pubKey(bobPrivate,g,p);
         int aliceKey=getKey(bobPublic, alicePrivate, p);
         int bobKey=getKey(alicePublic,bobPrivate,p);
+        System.out.println("privKey: " +alicePrivate + " " + bobPrivate);
+        
         System.out.println("pubKey: " +alicePublic + " " + bobPublic);
+        
         System.out.println("key: " +aliceKey + " " + bobKey);
     }
     
