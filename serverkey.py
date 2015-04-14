@@ -5,8 +5,6 @@ mylist = []
 def cekpubkey(mylist, username):
     for terserah in mylist:
         kata = terserah.split(":")
-	print kata[1],kata[0]
-	print username[0]
         if (username[0] == kata[0]):
 	    print "masuk"
             return (kata[1])
@@ -21,7 +19,19 @@ def handler(clientsocket, clientaddr):
             print data
             t = data.split(":",1)
             if (t[0] == "stor"):
-                mylist.append(t[1])
+				
+				flag=0
+				for iteration in mylist:
+					user=iteration.split(":")
+					tmp=t[1].split(":")
+					print user[0],tmp[0]
+					if user[0]==tmp[0]:
+						mylist.remove(iteration)
+						mylist.append(t[1])
+						flag=1
+				
+				if flag==0 :
+					mylist.append(t[1])
             elif (t[0] == "get"):
                 result = cekpubkey(mylist, t[1].split('\r\n'))
 		clientsocket.send(result)
@@ -33,8 +43,8 @@ def handler(clientsocket, clientaddr):
 
 if __name__ == "__main__":
 
-    host = 'localhost'
-    port = 5001
+    host = ''
+    port = 5000
     buf = 1024
 
     addr = (host, port)
