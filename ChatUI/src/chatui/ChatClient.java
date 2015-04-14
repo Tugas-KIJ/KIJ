@@ -68,7 +68,7 @@ public class ChatClient extends javax.swing.JFrame {
 
         
         try {
-            Listen l = new Listen(ta_inbox, socket, l_kontak, t_to, tabel);
+            Listen l = new Listen(ta_inbox, socket, l_kontak, t_to);
             l.start();
             
             
