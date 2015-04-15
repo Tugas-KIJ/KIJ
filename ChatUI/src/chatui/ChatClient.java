@@ -60,12 +60,20 @@ public class ChatClient extends javax.swing.JFrame {
 });*/
     }
     
-    public static String keystringbinary(String a){
+       public static String keystringbinary(String a){
     byte[] infoBin;
     String g = "";
         infoBin = a.getBytes();
         for (byte b : infoBin) {
-            g += "0" + Integer.toBinaryString(b);
+            int o = Integer.toBinaryString(b).length();
+            if( o == 7)
+                g += "0" + Integer.toBinaryString(b);
+            else if( o == 8)
+                g += Integer.toBinaryString(b);
+            else if( o == 6)
+                g += "00" + Integer.toBinaryString(b);
+            else if( o == 5)
+                g += "000" + Integer.toBinaryString(b);
         }
         //System.out.println(g);
         return g;
