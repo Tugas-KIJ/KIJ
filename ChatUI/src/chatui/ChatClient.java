@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import sun.java2d.pipe.BufferedContext;
 
 /**
  *
@@ -27,7 +28,7 @@ public class ChatClient extends javax.swing.JFrame {
      * Creates new form ChatClient
      */
     
-    private BufferedReader keyRead, receiveRead;
+    private BufferedReader keyRead, receiveRead,servKeyReader;
     private OutputStream ostream;
     private PrintWriter pwrite;
     private InputStream istream; 
@@ -41,9 +42,11 @@ public class ChatClient extends javax.swing.JFrame {
     private ArrayList<String> pubKey;
     private List<String> clients;
     MessageDigest md = null;
+    Socket servkey;
     
     public ChatClient() {
         clients = new ArrayList();
+        pubKey = new ArrayList<>();
         
         initComponents();
         
@@ -60,7 +63,7 @@ public class ChatClient extends javax.swing.JFrame {
 });*/
     }
     
-       public static String keystringbinary(String a){
+    public static String keystringbinary(String a){
     byte[] infoBin;
     String g = "";
         infoBin = a.getBytes();
@@ -133,6 +136,7 @@ public class ChatClient extends javax.swing.JFrame {
         int panjang = pesan.length();
         int banyak_counter = panjang /8;
         //System.out.println(banyak_counter);
+        String temppesan = keystringbinary(pesan);
         for (int x = 0; x < banyak_counter; x = x+1)
         {
             
@@ -144,14 +148,14 @@ public class ChatClient extends javax.swing.JFrame {
              //key di enkrip
              
              // plain text 
-             String temp = pesan.substring((x*8),((x+1)*8));
+             String temp = temppesan.substring((x*64),((x+1)*64));
            //  System.out.println(temp);
-             String temppesan = keystringbinary(temp);
+             
              //System.out.println(temppesan);
              //System.out.println("");
              
              
-             String xor = XOR(temppesan,hasil_enkrip,64);
+             String xor = XOR(temp,hasil_enkrip,64);
              //String xor2 = XOR(temppesan,hasil_enkrip,64);
             /* //System.out.println(xor);
              byte[] infoBin;
@@ -161,7 +165,7 @@ public class ChatClient extends javax.swing.JFrame {
              {
                 cipher_text += Integer.toBinaryString(b);
              }*/
-            System.out.println("tes");
+            //System.out.println("tes");
             cipher_text += xor;
             //lop += kk;
              //cipher_text = cipher_text + ;
@@ -173,7 +177,7 @@ public class ChatClient extends javax.swing.JFrame {
          //cipher_text = 
         //aaaa += binToString(cipher_text);
        // bbbb += binToString(lop);
-         System.out.println(cipher_text);
+         //System.out.println(cipher_text);
         //============================================================= decrypt
         System.out.println(cipher_text);
         return cipher_text;
@@ -181,6 +185,7 @@ public class ChatClient extends javax.swing.JFrame {
     
     private String count2(String pesan)
     {
+        System.out.println("---------------");
         String counter = "akuwahyu";
         String key = "akuhafiz";
         //String kk = "";
@@ -204,13 +209,13 @@ public class ChatClient extends javax.swing.JFrame {
             
              counter = counter + x;
              
-            String hasil_enkrip = des.Enkripsi2(key, counter);
+            String hasil_enkrip = des.Enkripsi(key, counter);
             //System.out.println(hasil_enkrip);
     //         Integer.toBinaryString(counter);
              //key di enkrip
              
              // plain text 
-             String temp = pesan.substring((x*8),((x+1)*8));
+             String temp = pesan.substring((x*64),((x+1)*64));
            //  System.out.println(temp);
             // String temppesan = keystringbinary(temp);
              //System.out.println(temppesan);
@@ -227,22 +232,22 @@ public class ChatClient extends javax.swing.JFrame {
              {
                 cipher_text += Integer.toBinaryString(b);
              }*/
-            System.out.println("tes");
+            //System.out.println("tes");
             cipher_text += xor;
             //lop += kk;
              //cipher_text = cipher_text + ;
            // System.out.println(cipher_text);
        
         }
-        //String aaaa= "";
+        String aaaa= "";
        // String bbbb="";
          //cipher_text = 
-        //aaaa += binToString(cipher_text);
+        aaaa += binToString(cipher_text);
        // bbbb += binToString(lop);
-         System.out.println(cipher_text);
+        // System.out.println(cipher_text);
         //============================================================= decrypt
-        System.out.println(cipher_text);
-        return cipher_text;
+        System.out.println(aaaa);
+        return aaaa;
     }
     
     public boolean start() {
@@ -596,11 +601,13 @@ public class ChatClient extends javax.swing.JFrame {
         
         try {
             Socket sock = new Socket(t_serverkey.getText(),Integer.parseInt(t_portkey.getText()));
+            servkey=sock;
             ostreamKey = sock.getOutputStream();
             pwriteKey = new PrintWriter(ostreamKey, true);   // receiving from server ( receiveRead object) 
             istreamKey = sock.getInputStream(); 
+            servKeyReader =new BufferedReader(new InputStreamReader(istreamKey));
             pwriteKey.println("stor:"+this.name+":"+ownpubKey);
-            Listen l = new Listen(ta_inbox, socket, l_kontak, t_to,sock);
+            Listen l = new Listen(ta_inbox, socket, l_kontak, t_to,sock,servKeyReader,pwriteKey,pubKey,ownPrivKey);
             l.start();
         } catch (IOException ex) {
             Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -658,9 +665,43 @@ public class ChatClient extends javax.swing.JFrame {
         System.out.println(count2(aa));
         
         
-        String message = ":" + t_to.getText() + ":" + aa;
+        String message = ":" + t_to.getText() + ":" + count2(aa);
+        int flag=0;
+        String key = null;
+        if(pubKey.isEmpty()){
+            
+        }
+        else
+        {
+            for(int i=0;i<pubKey.size();i++)
+            {
+                String respKey=pubKey.get(i);
+                String[] rs = respKey.split(":");
+                if(t_to.getText()==rs[0])
+                {
+                    key=rs[1];
+                    
+                    flag=1;
+                    break;
+                }
+            }
+        }
         
-        
+        if(flag==0)
+        {
+            try {
+                pwriteKey.println("get:"+t_to.getText());
+
+                String getKey=servKeyReader.readLine();
+                key=getKey;
+                System.out.println(getKey);
+                pubKey.add(t_to.getText()+":"+getKey);
+            } catch (IOException ex) {
+                Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        int DHKey=getKey(Integer.parseInt(key),Integer.parseInt(ownPrivKey), p);
+        System.out.println("to: "+DHKey);
         //System.out.println(message);
         pwrite.println(message);
         //message="$";
