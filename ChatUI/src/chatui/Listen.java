@@ -51,9 +51,27 @@ public void run() {
             {
                if(receiveMessage.startsWith(";")==false)
                {
-                   String[] pesan = receiveMessage.split(";");
-                    ta_inbox.append(pesan[0]);
-                     ta_inbox.append("\n");
+                   String[] pesan = receiveMessage.split("~");
+                   String[] pesan2 = pesan[0].split("\r\n");
+                   
+                   String tmp=new String(pesan2[0]);
+                   System.out.println("tmp"+tmp);
+                   String[] sender=tmp.split(":");
+                   if(sender[0].length()>3 && sender[0].length()<9)
+                   {
+                     System.out.println("x");
+                     pwriter.println("get:"+sender[0]);
+                     String getKey=readerKey.readLine();
+                     String key=getKey;
+                    
+                     int DHkey=getKey(Integer.parseInt( key), Integer.parseInt(ownerSecret), 353);
+                     System.out.println("Sender Key: " + DHkey);
+                   
+                   }
+
+                   
+                   ta_inbox.append(tmp);
+                   ta_inbox.append("\n");
                }
                else
                {
