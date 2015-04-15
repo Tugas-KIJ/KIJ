@@ -6,16 +6,14 @@
 package chatui;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 
 /**
@@ -33,10 +31,16 @@ public class ChatClient extends javax.swing.JFrame {
     private OutputStream ostream;
     private PrintWriter pwrite;
     private InputStream istream; 
+    private OutputStream ostreamKey;
+    private PrintWriter pwriteKey;
+    private InputStream istreamKey;
     private Socket socket;
-    private String server, name;
+    private String server, name,pass;
     private int port;
+    private String ownPrivKey;
+    private ArrayList<String> pubKey;
     private List<String> clients;
+    MessageDigest md = null;
     
     public ChatClient() {
         clients = new ArrayList();
@@ -69,8 +73,10 @@ public class ChatClient extends javax.swing.JFrame {
     
     public static String XOR(String a, String b, int panjang){
         String g="";
+        System.out.println(a);
+        System.out.println(b);
        // System.out.println(a.length());
-        for(int i = 0; i<panjang;i++){
+        for(int i = 0; i<a.length();i++){
             if(a.charAt(i)== b.charAt(i)){
                 g += "0";
             }
@@ -81,33 +87,154 @@ public class ChatClient extends javax.swing.JFrame {
         return g;
     }
     
-    private void count1(String pesan)
+    private String binToString (String a )
+    {
+        String hasil = "";
+        int z = a.length()/8;
+        for (int x = 0; x < z ; x = x+1)
+        {
+             String temp = a.substring((x*8),((x+1)*8));
+             int charCode = Integer.parseInt(temp, 2);
+             String str = new Character((char)charCode).toString();
+             //System.out.println("str = " + str);
+             hasil += str;
+             
+             
+        }
+        System.out.println("hasil = " + hasil);
+        return hasil;
+    }
+    
+    private String count1(String pesan)
     {
         String counter = "akuwahyu";
         String key = "akuhafiz";
+        //String kk = "";
+        //kk += keystringbinary(pesan);
         
+        
+        String cipher_text = "";
+        String lop ="";
         
         DES des = new DES();
-        String hasil_enkrip = des.Enkripsi(key, counter);
-        System.out.println(hasil_enkrip);
         //panggil difhel
         //panggil encrypt 
         String encript;
-        String convxor;
+        //String cipher_text;
         String cipher;
         int panjang = pesan.length();
         int banyak_counter = panjang /8;
+        //System.out.println(banyak_counter);
         for (int x = 0; x < banyak_counter; x = x+1)
         {
             
              counter = counter + x;
+             
+            String hasil_enkrip = des.Enkripsi(key, counter);
+            //System.out.println(hasil_enkrip);
     //         Integer.toBinaryString(counter);
              //key di enkrip
              
              // plain text 
-             String temp = pesan.substring((x*8),((x+1)*8)-1);
-        //     convxor = XOR(temp,encript);
+             String temp = pesan.substring((x*8),((x+1)*8));
+           //  System.out.println(temp);
+             String temppesan = keystringbinary(temp);
+             //System.out.println(temppesan);
+             //System.out.println("");
+             
+             
+             String xor = XOR(temppesan,hasil_enkrip,64);
+             //String xor2 = XOR(temppesan,hasil_enkrip,64);
+            /* //System.out.println(xor);
+             byte[] infoBin;
+            //String g = "";
+             infoBin = xor.getBytes();
+             for (byte b : infoBin) 
+             {
+                cipher_text += Integer.toBinaryString(b);
+             }*/
+            System.out.println("tes");
+            cipher_text += xor;
+            //lop += kk;
+             //cipher_text = cipher_text + ;
+           // System.out.println(cipher_text);
+       
         }
+        //String aaaa= "";
+       // String bbbb="";
+         //cipher_text = 
+        //aaaa += binToString(cipher_text);
+       // bbbb += binToString(lop);
+         System.out.println(cipher_text);
+        //============================================================= decrypt
+        System.out.println(cipher_text);
+        return cipher_text;
+    }
+    
+    private String count2(String pesan)
+    {
+        String counter = "akuwahyu";
+        String key = "akuhafiz";
+        //String kk = "";
+        //kk += keystringbinary(pesan);
+        
+        
+        String cipher_text = "";
+        String lop ="";
+        
+        DES des = new DES();
+        //panggil difhel
+        //panggil encrypt 
+        String encript;
+        //String cipher_text;
+        String cipher;
+        int panjang = pesan.length()/8;
+        int banyak_counter = panjang /8;
+        //System.out.println(banyak_counter);
+        for (int x = 0; x < banyak_counter; x = x+1)
+        {
+            
+             counter = counter + x;
+             
+            String hasil_enkrip = des.Enkripsi2(key, counter);
+            //System.out.println(hasil_enkrip);
+    //         Integer.toBinaryString(counter);
+             //key di enkrip
+             
+             // plain text 
+             String temp = pesan.substring((x*8),((x+1)*8));
+           //  System.out.println(temp);
+            // String temppesan = keystringbinary(temp);
+             //System.out.println(temppesan);
+             //System.out.println("");
+             
+             
+             String xor = XOR(temp,hasil_enkrip,64);
+             //String xor2 = XOR(temppesan,hasil_enkrip,64);
+            /* //System.out.println(xor);
+             byte[] infoBin;
+            //String g = "";
+             infoBin = xor.getBytes();
+             for (byte b : infoBin) 
+             {
+                cipher_text += Integer.toBinaryString(b);
+             }*/
+            System.out.println("tes");
+            cipher_text += xor;
+            //lop += kk;
+             //cipher_text = cipher_text + ;
+           // System.out.println(cipher_text);
+       
+        }
+        //String aaaa= "";
+       // String bbbb="";
+         //cipher_text = 
+        //aaaa += binToString(cipher_text);
+       // bbbb += binToString(lop);
+         System.out.println(cipher_text);
+        //============================================================= decrypt
+        System.out.println(cipher_text);
+        return cipher_text;
     }
     
     public boolean start() {
@@ -122,8 +249,7 @@ public class ChatClient extends javax.swing.JFrame {
 
         
         try {
-            Listen l = new Listen(ta_inbox, socket, l_kontak, t_to);
-            l.start();
+           
             
             
             
@@ -178,7 +304,7 @@ public class ChatClient extends javax.swing.JFrame {
          if(plain.length()%8!=0) {
             int len=8-plain.length()%8;
             for(; i<len; i++)
-                plain=plain.concat(";");
+                plain=plain.concat("~");
         } else {
             return plain;
         }
@@ -219,6 +345,12 @@ public class ChatClient extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        t_pass1 = new javax.swing.JPasswordField();
+        jLabel12 = new javax.swing.JLabel();
+        t_serverkey = new javax.swing.JTextField();
+        t_portkey = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -246,11 +378,11 @@ public class ChatClient extends javax.swing.JFrame {
             }
         });
 
-        t_server.setText("10.151.36.26");
+        t_server.setText("10.151.36.21");
 
         t_port.setText("9000");
 
-        t_nama.setText("WAHYU");
+        t_nama.setText("wahyu");
         t_nama.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 t_namaActionPerformed(evt);
@@ -291,6 +423,19 @@ public class ChatClient extends javax.swing.JFrame {
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel9.setText("PUBLIC KEY");
 
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel10.setText("Password");
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel11.setText("Port Key");
+
+        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel12.setText("Server Key");
+
+        t_serverkey.setText("10.151.36.21");
+
+        t_portkey.setText("5000");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -298,49 +443,61 @@ public class ChatClient extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(t_server, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(t_port, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel7)
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(t_nama, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel8)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(b_masuk)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(b_keluar)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(t_to, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(t_pesan, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(b_kirim))
+                            .addComponent(t_to, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel9)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(t_pesan, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(b_kirim))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addGap(18, 18, 18)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(jLabel5)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(t_server, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jLabel6)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(t_port, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jLabel12)
+                            .addGap(18, 18, 18)
+                            .addComponent(t_serverkey, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jLabel11)
+                            .addGap(18, 18, 18)
+                            .addComponent(t_portkey))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel7)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(t_nama, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(jLabel10)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(t_pass1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(b_masuk)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(b_keluar))))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -351,21 +508,28 @@ public class ChatClient extends javax.swing.JFrame {
                     .addComponent(jLabel6)
                     .addComponent(t_server, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(t_port, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7)
-                    .addComponent(t_nama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(b_masuk)
-                    .addComponent(b_keluar))
+                    .addComponent(jLabel12)
+                    .addComponent(jLabel11)
+                    .addComponent(t_serverkey, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(t_portkey, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(t_nama)
+                    .addComponent(jLabel10)
+                    .addComponent(b_masuk)
+                    .addComponent(b_keluar)
+                    .addComponent(t_pass1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
                     .addComponent(jScrollPane1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel8)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -391,6 +555,10 @@ public class ChatClient extends javax.swing.JFrame {
         this.server = t_server.getText();
         this.port = new Integer (t_port.getText());
         this.name = t_nama.getText();
+        //this.pass = t_portkey.getText();
+  //      String pol = count1("hafiznuzaldjufri");
+//        count1(pol);
+        this.pass=t_pass1.getText();
         if (start())
         {
             t_server.setEditable(false);
@@ -400,18 +568,66 @@ public class ChatClient extends javax.swing.JFrame {
             b_kirim.setEnabled(true);
             b_masuk.setEnabled(false);
             b_keluar.setEnabled(true);
+            t_portkey.setEditable(false);
+            t_pass1.setEditable(false);
         }
-        
-        
-        pwrite.println(name); // sending to server
+        try {
+            md = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String pass = this.pass+this.name;
+        String hash=byteArrayToHexString(md.digest(pass.getBytes()));
+        System.out.println(hash);
+        pwrite.println(name+":"+hash); // sending to server
         System.out.println(name);
         pwrite.flush(); // flush the data 
-       
+        this.ownPrivKey =Integer.toString(random());
+        String ownpubKey = Integer.toString(pubKey(Integer.parseInt(ownPrivKey),g,p));
+        System.out.println(ownpubKey+" " + ownPrivKey);
+        
+        try {
+            Socket sock = new Socket(t_serverkey.getText(),Integer.parseInt(t_portkey.getText()));
+            ostreamKey = sock.getOutputStream();
+            pwriteKey = new PrintWriter(ostreamKey, true);   // receiving from server ( receiveRead object) 
+            istreamKey = sock.getInputStream(); 
+            pwriteKey.println("stor:"+this.name+":"+ownpubKey);
+            Listen l = new Listen(ta_inbox, socket, l_kontak, t_to,sock);
+            l.start();
+        } catch (IOException ex) {
+            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         Userr li = new Userr(socket);
         li.start();
     }                                       
-
-
+    
+    static int p= 353;
+    static int g= 3;
+    static int min=50;
+    public static int random()
+    {
+        return (int) (min + (Math.random() * (p - min)));
+    }
+    public static int pubKey(int key,int g,int p)
+    {
+        BigInteger pub= BigInteger.valueOf(g).pow(key).mod(BigInteger.valueOf(p));
+        return pub.intValue();
+    }
+    public static  int getKey(int pubKey,int secKey,int p)
+    {
+        BigInteger key= BigInteger.valueOf(pubKey).pow(secKey).mod(BigInteger.valueOf(p));
+        return key.intValue();
+    }
+    
+    public static String byteArrayToHexString(byte[] b) {
+      String result = "";
+      for (int i=0; i < b.length; i++) {
+        result += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+      }
+      return result;
+    }
+    
     
     private void b_kirimActionPerformed(java.awt.event.ActionEvent evt) {                                        
         
@@ -427,10 +643,14 @@ public class ChatClient extends javax.swing.JFrame {
         }
         
         String ui = CheckLenPlain(t_pesan.getText());
+        String aa ="";
+        
+        System.out.println(ui);
+        aa += count1(ui);
+        System.out.println(count2(aa));
         
         
-        
-        String message = ":" + t_to.getText() + ":" + ui;
+        String message = ":" + t_to.getText() + ":" + aa;
         
         
         //System.out.println(message);
@@ -506,6 +726,9 @@ public class ChatClient extends javax.swing.JFrame {
     private javax.swing.JButton b_kirim;
     private javax.swing.JButton b_masuk;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -517,9 +740,12 @@ public class ChatClient extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField2;
     private javax.swing.JList l_kontak;
     private javax.swing.JTextField t_nama;
+    private javax.swing.JPasswordField t_pass1;
     private javax.swing.JTextField t_pesan;
     private javax.swing.JTextField t_port;
+    private javax.swing.JTextField t_portkey;
     private javax.swing.JTextField t_server;
+    private javax.swing.JTextField t_serverkey;
     private javax.swing.JTextField t_to;
     private javax.swing.JTextArea ta_inbox;
     // End of variables declaration                   
