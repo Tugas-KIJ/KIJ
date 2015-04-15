@@ -169,13 +169,22 @@ public class DES {
     }
     
     // Fungsi mengubah key (string) menjadi key (binary)
-    private static String keystringbinary(String a){
+    public static String keystringbinary(String a){
     byte[] infoBin;
     String g = "";
         infoBin = a.getBytes();
         for (byte b : infoBin) {
-            g += "0" + Integer.toBinaryString(b);
+            int o = Integer.toBinaryString(b).length();
+            if( o == 7)
+                g += "0" + Integer.toBinaryString(b);
+            else if( o == 8)
+                g += Integer.toBinaryString(b);
+            else if( o == 6)
+                g += "00" + Integer.toBinaryString(b);
+            else if( o == 5)
+                g += "000" + Integer.toBinaryString(b);
         }
+        //System.out.println(g);
         return g;
     }
     
@@ -326,6 +335,83 @@ public class DES {
         PPLPR = permutation(PLPR, IP_);
         
         return PPLPR;
+    }
+    
+    public static String CTREnkripsi(String a)
+    {
+        
+        
+        return a;
+    }
+    
+    public static String Enkripsi2(String plainbinary, String key){
+        String cipher;
+        
+      //  String plainbinary;
+        String plainip;
+        String[] PL = new String[17];
+        String[] PR = new String[17];
+        String[] EPR = new String[17];
+        String[] KEPR = new String[17];
+        String[] SKEPR = new String[17];
+        String[] PSKEPR = new String[17];
+        String PLPR;
+        String PPLPR;
+ 
+        String bkey;
+        String pcbkey;
+        String[] L = new String[17];
+        String[] R = new String[17];
+        String[] LR = new String[17];
+        String[] LRF = new String[17];
+        
+                
+        bkey = keystringbinary(key);
+        pcbkey = permutation(bkey, PC1);
+        
+        L[0] = pcbkey.substring(0,28);
+        R[0] = pcbkey.substring(28,56);
+        
+        for(int i=1; i<17;i++){
+            L[i] = LeftShift(L[i-1],Shift[i-1]);
+            R[i] = LeftShift(R[i-1],Shift[i-1]);
+        }
+        
+        for(int i=1; i<17;i++){
+            LR[i] = "";
+            LR[i] += L[i] + R[i];
+        }
+        
+        for(int i=1; i<17;i++){
+           LRF[i] = permutation(LR[i], PC2);
+        }
+        
+        //plainbinary = keystringbinary(plain);
+        plainip = permutation(plainbinary, IP);
+        
+        PL[0] = plainip.substring(0,32);
+        PR[0] = plainip.substring(32,64);
+        
+        for(int z=0; z<16; z++){
+            EPR[z] = permutation(PR[z], Expansion);
+            KEPR[z] = XOR(LRF[z+1],EPR[z]);
+            SKEPR[z] = subtitusi(KEPR[z]);
+            PSKEPR[z] = permutation(SKEPR[z], P);
+            PL[z+1]= PR[z];
+            PR[z+1]= XOR2(PSKEPR[z],PL[z]);
+        }
+        
+        PLPR = "";
+        PLPR += PR[16] + PL[16];
+        PPLPR = permutation(PLPR, IP_);
+        
+        return PPLPR;
+    }
+    
+    public static String CounTeR(String a)
+    {
+        
+        return a;
     }
     
     public static String Dekripsi(String plain, String key){
