@@ -116,10 +116,10 @@ public class ChatClient extends javax.swing.JFrame {
         return hasil;
     }
     
-    private String count1(String pesan)
+    private String count1(String pesan, String key)
     {
         String counter = "akuwahyu";
-        String key = "akuhafiz";
+       // String key = "akuhafiz";
         //String kk = "";
         //kk += keystringbinary(pesan);
         
@@ -183,11 +183,11 @@ public class ChatClient extends javax.swing.JFrame {
         return cipher_text;
     }
     
-    private String count2(String pesan)
+    private String count2(String pesan, String key)
     {
         System.out.println("---------------");
         String counter = "akuwahyu";
-        String key = "akuhafiz";
+     //   String key = "akuhafiz";
         //String kk = "";
         //kk += keystringbinary(pesan);
         
@@ -611,6 +611,8 @@ public class ChatClient extends javax.swing.JFrame {
             l.start();
         } catch (IOException ex) {
             Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         Userr li = new Userr(socket);
@@ -657,15 +659,17 @@ public class ChatClient extends javax.swing.JFrame {
             return;
         }
         
-        String ui = CheckLenPlain(t_pesan.getText());
+        String hash=byteArrayToHexString(md.digest(t_pesan.getText().getBytes()));
+        
+        String ui = CheckLenPlain(t_pesan.getText() + ":" + hash);
         String aa ="";
         
-        System.out.println(ui);
-        aa += count1(ui);
-        System.out.println(count2(aa));
+        //System.out.println(ui);
+        //aa += count1(ui);
+        //System.out.println("ini aa = " +aa);
         
         
-        String message = ":" + t_to.getText() + ":" + count2(aa);
+       // String message = ":" + t_to.getText() + ":" + aa;
         int flag=0;
         String key = null;
         if(pubKey.isEmpty()){
@@ -702,6 +706,25 @@ public class ChatClient extends javax.swing.JFrame {
         }
         int DHKey=getKey(Integer.parseInt(key),Integer.parseInt(ownPrivKey), p);
         System.out.println("to: "+DHKey);
+        
+        
+        String ddd= Integer.toString(DHKey);
+        //System.out.println(ddd);
+        int dddd = ddd.length();
+        if(dddd == 2)
+        {
+            ddd += ddd + ddd + ddd; 
+        }
+        else{
+            ddd += ddd + ddd.charAt(0) + ddd.charAt(1);
+        }
+                    
+        aa += count1(ui,ddd);
+        System.out.println("input1: "+aa);
+        
+        String message = ":" + t_to.getText() + ":" + aa;
+        
+        
         //System.out.println(message);
         pwrite.println(message);
         //message="$";
